@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Solid green matching the Flutter SplashScreen background exactly.
+     No image — so the transition from native splash to Flutter
+     SplashScreen is seamless (one unified green screen). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <bitmap android:gravity="fill" android:src="@drawable/background"/>
+        <color android:color="#1E5A46"/>
     </item>
 </layer-list>
