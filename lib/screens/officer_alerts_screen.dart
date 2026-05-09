@@ -176,9 +176,14 @@ class _OfficerAlertsScreenState extends State<OfficerAlertsScreen> {
 
     // Build proper image URL
     final rawUrl = alert.imageUrl;
-    final imageUrl = rawUrl.isNotEmpty
-        ? "${ApiConfig.baseUrl}/api/images/${rawUrl.split('/').last}"
-        : '';
+    final String imageUrl;
+    if (rawUrl.isEmpty) {
+      imageUrl = "";
+    } else if (rawUrl.startsWith('http')) {
+      imageUrl = rawUrl;
+    } else {
+      imageUrl = "${ApiConfig.baseUrl}/api/images/${rawUrl.split('/').last}";
+    }
 
     return GestureDetector(
       onTap: () async {

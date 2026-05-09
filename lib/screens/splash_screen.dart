@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'farmer_dashboard.dart';
+import 'officer_dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,8 +17,31 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    Future.delayed(const Duration(milliseconds: 3000), () async {
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString('user_role');
+      
       if (mounted) {
+        if (role == 'farmer') {
+          final deviceId = prefs.getString('device_id');
+          if (deviceId != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => FarmerDashboard(deviceId: deviceId)),
+            );
+            return;
+          }
+        } else if (role == 'officer') {
+          final officerId = prefs.getString('officer_id');
+          if (officerId != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => OfficerDashboard(officerId: officerId)),
+            );
+            return;
+          }
+        }
+        
         Navigator.pushReplacementNamed(context, '/login');
       }
     });

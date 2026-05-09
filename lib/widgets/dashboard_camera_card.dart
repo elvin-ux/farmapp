@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app_theme.dart';
 import '../models/camera_model.dart';
@@ -25,8 +24,7 @@ class DashboardCameraCard extends StatefulWidget {
 }
 
 class _DashboardCameraCardState extends State<DashboardCameraCard> {
-  RTCPeerConnection? _pc;
-  final RTCVideoRenderer _renderer = RTCVideoRenderer();
+  VlcPlayerController? _vlcController;
   bool _isInitializing = false;
   bool _hasVideo = false;
 
@@ -42,86 +40,34 @@ class _DashboardCameraCardState extends State<DashboardCameraCard> {
     setState(() {
       _isInitializing = true;
     });
-    
-    await _renderer.initialize();
 
-    _pc = await createPeerConnection({
-      'iceServers': [
-        {'urls': 'stun:stun.l.google.com:19302'},
-        {
-          'urls': 'turn:openrelay.metered.ca:80',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject'
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:443',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject'
-        }
-      ]
-    });
+    final streamUrl = CameraService.getStreamUrl(widget.deviceId);
 
-    _pc!.onTrack = (event) {
-      if (event.streams.isNotEmpty) {
-        _renderer.srcObject = event.streams[0];
-        _hasVideo = true;
-      } else {
-        if (_renderer.srcObject == null) {
-          createLocalMediaStream('remote_stream').then((stream) {
-            stream.addTrack(event.track);
-            _renderer.srcObject = stream;
-            _hasVideo = true;
-            if (mounted) setState(() {});
-          });
-        } else {
-          _renderer.srcObject!.addTrack(event.track);
-          _hasVideo = true;
-        }
-      }
-      if (mounted) setState(() {});
-    };
+    _vlcController = VlcPlayerController.network(
+      streamUrl,
+      hwAcc: HwAcc.full,
+      autoPlay: true,
+      options: VlcPlayerOptions(
+        advanced: VlcAdvancedOptions([
+          VlcAdvancedOptions.networkCaching(2000),
+        ]),
+      ),
+    );
 
-    try {
-      final streamUrl = CameraService.getStreamUrl(widget.deviceId);
-
-      await _pc!.addTransceiver(
-        kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-        init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
-      );
-
-      var offer = await _pc!.createOffer();
-      await _pc!.setLocalDescription(offer);
-
-      final res = await http.post(
-        Uri.parse(streamUrl),
-        headers: {
-          "Content-Type": "application/sdp",
-          "Accept": "application/sdp",
-        },
-        body: offer.sdp,
-      );
-
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        String sdp = res.body;
-        await _pc!.setRemoteDescription(
-          RTCSessionDescription(sdp, "answer"),
-        );
-      }
-    } catch (e) {
-      debugPrint("Camera card WebRTC error: \$e");
-    } finally {
-      if (mounted) {
+    _vlcController!.addListener(() {
+      if (!mounted) return;
+      if (_vlcController!.value.isPlaying && !_hasVideo) {
         setState(() {
           _isInitializing = false;
+          _hasVideo = true;
         });
       }
-    }
+    });
   }
 
   @override
   void dispose() {
-    _renderer.dispose();
-    _pc?.close();
+    _vlcController?.dispose();
     super.dispose();
   }
 
@@ -174,11 +120,19 @@ class _DashboardCameraCardState extends State<DashboardCameraCard> {
                   ],
                 ),
               )
-            else if (_hasVideo && _renderer.srcObject != null)
+            else if (_vlcController != null)
                SizedBox.expand(
-                child: RTCVideoView(
-                  _renderer,
-                  objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                child: FittedBox(
+                  fit: BoxFit.cover,
+                  child: SizedBox(
+                    width: 16,
+                    height: 9,
+                    child: VlcPlayer(
+                      controller: _vlcController!,
+                      aspectRatio: 16 / 9,
+                      placeholder: const Center(child: CircularProgressIndicator(color: Colors.white54)),
+                    ),
+                  ),
                 ),
               )
             else

@@ -215,7 +215,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final titles = ["Dashboard", "Alerts", "Analytics", "Chat", "Profile"];
+    final titles = ["Dashboard", "Alerts", "Analytics", "Chat", "Profile", "Notifications"];
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final navBg = isDark ? AppColors.surfaceDark : Colors.white;
     final selectedColor = AppColors.getPrimary(Theme.of(context).brightness);
@@ -283,7 +283,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
             icon: const Icon(Icons.notifications_none_rounded, size: 28),
             onPressed: () {
               setState(() {
-                selectedIndex = 3;
+                selectedIndex = 5; // Route to Notifications tab instead of Chat
                 unreadCount = 0;
               });
             },

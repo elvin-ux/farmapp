@@ -113,7 +113,7 @@ class _CameraDetailsScreenState extends State<CameraDetailsScreen> {
         kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
         init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
       );
-      
+
       try {
         print("[WebRTC] Adding receive-only Audio Transceiver");
         await _pc!.addTransceiver(
@@ -150,8 +150,8 @@ class _CameraDetailsScreenState extends State<CameraDetailsScreen> {
 
         // If Mediamtx or Cloudflare WHEP returns a Link header for patch,
         // or just relies on the SDP response body.
-        
-        // Some servers wrap the SDP in JSON, but standard WHEP usually returns raw SDP. 
+
+        // Some servers wrap the SDP in JSON, but standard WHEP usually returns raw SDP.
         // We will assume WHEP raw SDP for now.
         print("[WebRTC] Setting Remote Description from Answer...");
         await _pc!.setRemoteDescription(
@@ -449,7 +449,7 @@ class _CameraDetailsScreenState extends State<CameraDetailsScreen> {
       if (!hasAccess) {
         final request = await Gal.requestAccess(toAlbum: true);
         if (!request) {
-           ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Permission to save to gallery denied.')),
           );
           return;
@@ -458,7 +458,7 @@ class _CameraDetailsScreenState extends State<CameraDetailsScreen> {
 
       final videoTrack = _renderer.srcObject!.getVideoTracks().firstOrNull;
       if (videoTrack == null) {
-         ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No video track found.')),
         );
         return;
@@ -495,7 +495,7 @@ class _CameraDetailsScreenState extends State<CameraDetailsScreen> {
       if (!hasAccess) {
         final request = await Gal.requestAccess(toAlbum: true);
         if (!request) {
-           ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Permission to save to gallery denied.')),
           );
           return;
@@ -565,7 +565,7 @@ class _CameraDetailsScreenState extends State<CameraDetailsScreen> {
 
   void _enterFullscreen() async {
     if (_renderer.srcObject == null) return;
-    
+
     // Force landscape mode
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,

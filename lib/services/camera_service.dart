@@ -8,7 +8,7 @@ class CameraService {
 
   /// 🔥 ADD THIS (stream base URL — CHANGE when tunnel changes)
   static const String streamBaseUrl =
-      "https://christ-programmes-dressed-storm.trycloudflare.com/device001/whep";
+      "https://contributions-ste-harper-dvds.trycloudflare.com/device001/whep";
 
   /// Fetch all cameras for a device
   static Future<List<CameraDevice>> getCameras(String deviceId) async {

@@ -461,8 +461,13 @@ class _DetectionScreenState extends State<DetectionScreen> {
   }
 
   Widget _buildDetectionCard(Detection d, int index) {
-    final filename = d.imageUrl.split('/').last;
-    final imageUrl = "$serverUrl/api/images/$filename";
+    final String imageUrl;
+    if (d.imageUrl.startsWith('http')) {
+      imageUrl = d.imageUrl;
+    } else {
+      final filename = d.imageUrl.split('/').last;
+      imageUrl = "$serverUrl/api/images/$filename";
+    }
 
     final confidencePercent = (d.confidence * 100).toStringAsFixed(0);
     final animalUpper = d.animal.toUpperCase();

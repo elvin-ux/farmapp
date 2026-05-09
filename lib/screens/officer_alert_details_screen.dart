@@ -88,6 +88,15 @@ class _OfficerAlertDetailsScreenState extends State<OfficerAlertDetailsScreen> {
     if (widget.alert.riskLevel == 'medium') riskColor = Colors.orange;
     if (widget.alert.riskLevel == 'low') riskColor = Colors.green;
 
+    final String displayImageUrl;
+    if (widget.alert.imageUrl.isEmpty) {
+      displayImageUrl = "";
+    } else if (widget.alert.imageUrl.startsWith('http')) {
+      displayImageUrl = widget.alert.imageUrl;
+    } else {
+      displayImageUrl = "${ApiConfig.baseUrl}/api/images/${widget.alert.imageUrl.split('/').last}";
+    }
+
     String formatTimestamp(String timestamp) {
       try {
         final date = DateTime.parse(timestamp).toLocal();
@@ -123,7 +132,7 @@ class _OfficerAlertDetailsScreenState extends State<OfficerAlertDetailsScreen> {
                         minScale: 1.0,
                         maxScale: 4.0,
                         child: Image.network(
-                          "${ApiConfig.baseUrl}/api/images/${widget.alert.imageUrl.split('/').last}",
+                          displayImageUrl,
                           headers: {"device-id": widget.alert.deviceId},
                           width: double.infinity,
                           height: 250,
